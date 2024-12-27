@@ -2,6 +2,13 @@
 #virtual Environment
 venv/
 
-# Ignoring  Python bytecode files
+# Ignoring  Python bytecode and compiled files
 *.pyc
 __pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+
+#Environment Variables
+.env
