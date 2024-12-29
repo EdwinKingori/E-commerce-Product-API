@@ -9,9 +9,13 @@ class Category(models.Model):
     featured_product = models.ForeignKey(
         'Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
+    class Meta:
+        verbose_name_plural = 'Categories'
+
 
 class Product(models.Model):
     name = models.CharField(max_length=250)
+    slug = models.SlugField()
     description = models.TextField()
     unitprice = models.DecimalField(
         max_digits=6, decimal_places=2, validators=[MinValueValidator(1)])
@@ -36,6 +40,9 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
+
+    class Meta:
+        ordering = ['user__first_name', 'user__last_name']
 
 
 class Cart(models.Model):
