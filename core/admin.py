@@ -5,6 +5,7 @@ from .models import User
 
 
 class UserAdmin(BaseUserAdmin):
+    # utilizing the attribute in django's User(BaseUserAdmin) admin
     add_fieldsets = (
         (
             None,
