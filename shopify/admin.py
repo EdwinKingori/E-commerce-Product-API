@@ -4,9 +4,12 @@ from .models import Category, Product, Customer, Order, OrderItem, Cart, CartIte
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'unitprice', 'stock_status']
+    list_display = ['name', 'unitprice', 'stock_status', 'category_title']
     list_editable = ['unitprice']
     list_per_page = 10
+
+    def category_title(self, product):
+        return product.category.title
 
     @admin.display(ordering='stock_quantity')
     def stock_status(self, value):

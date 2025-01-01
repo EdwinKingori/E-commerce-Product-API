@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib import admin
 from django.core.validators import MinValueValidator
 from django.conf import settings
+from django.utils.text import slugify
 # Create your models here.
 
 
@@ -16,7 +17,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=250)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
     unitprice = models.DecimalField(
         max_digits=6, decimal_places=2, validators=[MinValueValidator(1)])
@@ -24,6 +25,11 @@ class Product(models.Model):
     image_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
     Category = models.ForeignKey(Category, on_delete=models.PROTECT)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['name']
