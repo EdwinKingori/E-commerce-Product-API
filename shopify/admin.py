@@ -4,8 +4,15 @@ from .models import Category, Product, Customer, Order, OrderItem, Cart, CartIte
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'unitprice']
+    list_display = ['name', 'unitprice', 'stock_status']
     list_editable = ['unitprice']
+    list_per_page = 10
+
+    @admin.display(ordering='stock_quantity')
+    def stock_status(self, value):
+        if Product.stock_quantity < 10:
+            return 'Low'
+        return 'OK'
 
 
 class CustomerAdmin(admin.ModelAdmin):
@@ -19,3 +26,4 @@ class CategoryAdmin(admin.ModelAdmin):
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Customer, CustomerAdmin)
