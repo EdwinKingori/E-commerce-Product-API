@@ -24,7 +24,7 @@ class Product(models.Model):
     stock_quantity = models.IntegerField([MinValueValidator(1)])
     image_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
-    Category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -48,7 +48,7 @@ class Customer(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
-    @admin.display(ordering='user__fi rst_name')
+    @admin.display(ordering='user__first_name')
     def first_name(self):
         return self.user.first_name
 
@@ -92,8 +92,8 @@ class Order(models.Model):
 
     payment_status = models.CharField(
         max_length=1, choices=PAYMENT_STATUS, default=PAYMENT_STATUS_PENDING)
-    created_at = models.DateTimeField(auto_now_add=True)
-    Customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    placed_at = models.DateTimeField(auto_now_add=True)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
 
 
 class OrderItem(models.Model):

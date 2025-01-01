@@ -3,10 +3,16 @@ from .models import Category, Product, Customer, Order, OrderItem, Cart, CartIte
 # Register your models here.
 
 
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name']
+
+
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'unitprice', 'stock_status', 'category_title']
     list_editable = ['unitprice']
     list_per_page = 10
+    # loading a related object (category) in the list page using the 'category_title' function
+    list_select_related = ['category']
 
     def category_title(self, product):
         return product.category.title
@@ -23,10 +29,11 @@ class CustomerAdmin(admin.ModelAdmin):
     ordering = ['user__first_name', 'user__last_name']
 
 
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ['id', 'placed_at', 'customer']
 
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Customer, CustomerAdmin)
+admin.site.register(Order, OrderAdmin)
