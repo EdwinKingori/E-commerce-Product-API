@@ -27,12 +27,28 @@ class CategoryAdmin(admin.ModelAdmin):
         )
 
 
+# creating a custom filter that allows admin to check products with low stock or inventory.
+class StockFilter(admin.SimpleListFilter):
+    title = 'stock_count'
+    parameter_name = 'stock_count'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('<10', "Low")
+        ]
+
+    def get_queryset(self, request, queryset):
+        if self.value() == '<10':
+            return queryset.filter(stock_count__lt=10)
+
+
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'unitprice', 'stock_status', 'category_title']
     list_editable = ['unitprice']
     list_per_page = 10
     # loading a related object (category) in the list page using the 'category_title' function
     list_select_related = ['category']
+    list_filter = ['category', 'last_update', StockFilter]
 
     def category_title(self, product):
         return product.category.title

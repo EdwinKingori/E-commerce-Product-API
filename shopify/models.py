@@ -23,7 +23,7 @@ class Product(models.Model):
         max_digits=6, decimal_places=2, validators=[MinValueValidator(1)])
     stock_quantity = models.IntegerField([MinValueValidator(1)])
     image_url = models.URLField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
     def save(self, *args, **kwargs):
