@@ -1,10 +1,30 @@
 from django.contrib import admin
+from django.db.models import Count
+from django.utils.html import format_html, urlencode
+from django.urls import reverse
 from .models import Category, Product, Customer, Order, OrderItem, Cart, CartItem
 # Register your models here.
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name', 'products_count']
+
+    @admin.display(ordering='products_count')
+    def products_count(self, category):
+        # syntax for reverse (custom url): app_model_targetmodel_changelist
+        url = (reverse('admin:shopify_product_changelist')
+               + '?'
+               + urlencode({
+                   'category__id': str(category.id)
+               }))
+        return format_html('<a href="{}">{}</a>', url, category.products_count)
+
+# since the collection object does not have a fied by the name products_count
+# we need to overwrite the queryset on this page and annotate the collections with the numberof their products.
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            products_count=Count('product')
+        )
 
 
 class ProductAdmin(admin.ModelAdmin):
