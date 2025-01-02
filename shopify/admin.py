@@ -45,8 +45,17 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name']
+    list_display = ['first_name', 'last_name', 'orders_count']
     ordering = ['user__first_name', 'user__last_name']
+
+    @admin.display(ordering='orders_count')
+    def orders_count(self, customer):
+        url = (reverse('admin:shopify_order_changelist')
+               + '?'
+               + urlencode({
+                   'customer__id': str(customer.id)
+               }))
+        return format_html('<a href="{}">{}</a>', url, customer.orders_count)
 
 
 class OrderAdmin(admin.ModelAdmin):
