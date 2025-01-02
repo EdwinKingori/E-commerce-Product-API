@@ -93,7 +93,8 @@ class Order(models.Model):
     payment_status = models.CharField(
         max_length=1, choices=PAYMENT_STATUS, default=PAYMENT_STATUS_PENDING)
     placed_at = models.DateTimeField(auto_now_add=True)
-    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.PROTECT, related_name='orders')
 
 
 class OrderItem(models.Model):

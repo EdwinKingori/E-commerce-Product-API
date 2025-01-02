@@ -21,4 +21,4 @@ def save_user_profile(sender, instance, **kwargs):
 def delete_user_profile(sender, instance, **kwargs):
     # deleting the associated user instance when a customer profile is deleted.
     if instance.user:
-        instance.customer.delete()
+        instance.user.delete()

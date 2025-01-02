@@ -29,17 +29,17 @@ class CategoryAdmin(admin.ModelAdmin):
 
 # creating a custom filter that allows admin to check products with low stock or inventory.
 class StockFilter(admin.SimpleListFilter):
-    title = 'stock_count'
-    parameter_name = 'stock_count'
+    title = 'stock_quantity'
+    parameter_name = 'stock_quantity'
 
     def lookups(self, request, model_admin):
         return [
             ('<10', "Low")
         ]
 
-    def get_queryset(self, request, queryset):
+    def queryset(self, request, queryset):
         if self.value() == '<10':
-            return queryset.filter(stock_count__lt=10)
+            return queryset.filter(stock_quantity__lt=10)
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -73,7 +73,8 @@ class CustomerAdmin(admin.ModelAdmin):
                + urlencode({
                    'customer__id': str(customer.id)
                }))
-        return format_html('<a href="{}">{}</a>', url, customer.orders_count)
+        count = customer.orders.count()
+        return format_html('<a href="{}">{}</a>', url, count)
 
 
 class OrderAdmin(admin.ModelAdmin):
