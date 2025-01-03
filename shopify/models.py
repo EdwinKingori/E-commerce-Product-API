@@ -24,7 +24,8 @@ class Product(models.Model):
     stock_quantity = models.IntegerField([MinValueValidator(1)])
     image_url = models.URLField()
     last_update = models.DateTimeField(auto_now_add=True)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, related_name='products')
 
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -8,6 +8,8 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id', 'name', 'products_count']
 
+    products_count = serializers.IntegerField()
+
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:

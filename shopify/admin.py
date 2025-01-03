@@ -23,7 +23,7 @@ class CategoryAdmin(admin.ModelAdmin):
 # we need to overwrite the queryset on this page and annotate the collections with the numberof their products.
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(
-            products_count=Count('product')
+            products_count=Count('products')
         )
 
 
