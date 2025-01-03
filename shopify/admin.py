@@ -49,6 +49,7 @@ class ProductAdmin(admin.ModelAdmin):
     # loading a related object (category) in the list page using the 'category_title' function
     list_select_related = ['category']
     list_filter = ['category', 'last_update', StockFilter]
+    search_fields = ['name', 'category_title']
 
     def category_title(self, product):
         return product.category.title
@@ -77,7 +78,14 @@ class CustomerAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, count)
 
 
+class OrderItemInLine(admin.TabularInline):
+    autocomplete_fields = ['product']
+    model = OrderItem
+
+
 class OrderAdmin(admin.ModelAdmin):
+    autocomplete = ['customer']
+    inlines = [OrderItemInLine]
     list_display = ['id', 'placed_at', 'customer']
 
 
@@ -85,3 +93,4 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(OrderItem)
