@@ -52,11 +52,11 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name', 'category_title']
 
     def category_title(self, product):
-        return product.category.title
+        return product.category.name
 
     @admin.display(ordering='stock_quantity')
-    def stock_status(self, value):
-        if Product.stock_quantity < 10:
+    def stock_status(self, product):
+        if product.stock_quantity < 10:
             return 'Low'
         return 'OK'
 
