@@ -2,8 +2,8 @@ from django.db.models.aggregates import Count
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from .serializers import ProductSerializer, CategorySerializer, CustomerSerializer
-from .models import Product, Customer, Category
+from .serializers import ProductSerializer, CategorySerializer, CustomerSerializer, OrderSerializer
+from .models import Product, Customer, Category, Order, OrderItem
 # Create your views here.
 
 
@@ -30,3 +30,8 @@ class ProductViewSet(viewsets.ModelViewSet):
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+
+class OrderViewset(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
