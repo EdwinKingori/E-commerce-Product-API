@@ -49,6 +49,7 @@ class ProductAdmin(admin.ModelAdmin):
     # loading a related object (category) in the list page using the 'category_title' function
     list_select_related = ['category']
     list_filter = ['category', 'last_update', StockFilter]
+    prepopulated_fields = {"slug": ("name",)}
     search_fields = ['name', 'category_title']
 
     def category_title(self, product):
