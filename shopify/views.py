@@ -24,9 +24,11 @@ class CategoryViewset(viewsets.ModelViewSet):
 
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend,
+                       filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category']
     search_fields = ['name', 'description']
+    ordering_fields = ['unitprice', 'last_update']
 
     def get_queryset(self):
         return Product.objects.all()
