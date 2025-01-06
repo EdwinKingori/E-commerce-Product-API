@@ -41,19 +41,19 @@ class OrderSerializer(serializers.ModelSerializer):
 class SimpleProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'title', 'unitprice']
+        fields = ['id', 'name', 'unitprice']
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = SimpleProductSerializer
+    product = SimpleProductSerializer()
     total_price = serializers.SerializerMethodField()
+
+    def get_total_price(self, cart_item: CartItem):
+        return cart_item.quantity * cart_item.product.unitprice
 
     class Meta:
         model = CartItem
         fields = ['id', 'product', 'quantity', 'total_price']
-
-    def get_total_price(self, cart_item: CartItem):
-        return cart_item.quantity * cart_item.product.unitprice
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -74,6 +74,44 @@ class CartSerializer(serializers.ModelSerializer):
     #     for item in cart.items.all():
     #         total_price += item.quantity * item.product.unitprice
     #     return total_price
+
+
+class AddItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField()
+
+    def validate_data(self, value):
+        if not Product.objects.filter(pk=value).exists():
+            raise serializers.ValidationError(
+                "No product with the given id was found!"
+            )
+        return value
+
+    def save(self, **kwargs):
+        cart_id = self.context['cart_id']
+        product_id = self.context['product_id']
+        quantity = self.context['quantity']
+
+        try:
+            cart_item = CartItem.objects.get(
+                cart_id=cart_id, product_id=product_id)
+            cart_item.quantity += quantity
+            cart_item.save()
+            self.instance = cart_item
+        except CartItem.DoesNotExist:
+            self.instance = CartItem.objects.create(
+                cart_id=cart_id, **self.validated_data)  # replaced product_id=product_id, quantity_id=quantity_id with the **self.validated_data
+
+        return self.instance
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product_id', 'quantity']
+
+
+class UpdateCartItemSerializer(serializers.ModelField):
+    class Meta:
+        model = CartItem
+        fields = ['quantity']
 
 
 class ReviewSerializer(serializers.ModelSerializer):

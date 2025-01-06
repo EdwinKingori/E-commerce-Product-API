@@ -5,8 +5,8 @@ from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
-from .serializers import ProductSerializer, CategorySerializer, CustomerSerializer, OrderSerializer, CartSerializer, CartItemSerializer
-from .models import Product, Customer, Category, Order, OrderItem, Cart, CartItem
+from .serializers import ProductSerializer, CategorySerializer, CustomerSerializer, ReviewSerializer, OrderSerializer, CartSerializer, CartItemSerializer, AddItemSerializer, UpdateCartItemSerializer
+from .models import Product, Customer, Category, Order, OrderItem, Cart, CartItem, Review
 from .pagination import DefaultPagination
 # Create your views here.
 
@@ -36,6 +36,24 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Product.objects.all()
 
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+    def destroy(self, request, *args, **kwargs):
+        if OrderItem.objects.filter(product_id=kwargs['pk']).count() > 0:
+            return Response({"error": "Selected product cannot be deleted beacuse it is associated with an order item. "}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().destroy(request, *args, **kwargs)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        return Review.objects.filter(product_id=self.kwargs['product_pk'])
+
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
+
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
@@ -55,4 +73,16 @@ class CartViewSet(CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, views
 
 
 class CartItemViewSet(viewsets.ModelViewSet):
-    pass
+    serializer_class = CartItemSerializer
+
+    def get_serializer_context(self):
+        if self.request.method == 'POST':
+            return AddItemSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCartItemSerializer
+        return CartItemSerializer
+
+    def get_queryset(self):
+        return CartItem.objects.\
+            filter(cart_id=self.kwargs['cart_pk'])\
+            .select_related('product')
