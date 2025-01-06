@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Category, Customer, Order, OrderItem
+from .models import Product, Category, Customer, Order, OrderItem, Review, Cart, CartItem
 from decimal import Decimal
 
 
@@ -34,3 +34,49 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['id', 'customer', 'payment_status', 'placed_at']
+
+# using this simpeproductserializer when returning basic product information is needed
+
+
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unitprice']
+
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', 'total_price']
+
+    def get_total_price(self, cart_item: CartItem):
+        return cart_item.quantity * cart_item.product.unitprice
+
+
+class CartSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)  # cannot send it to server
+    items = CartItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'created_at', 'items', 'total_price']
+
+    def get_total_price(self, cart: Cart):
+        return sum([item.quantity * item.product.unitprice for item in cart.items.all()])
+
+    # alternative for the above method
+    # def get_total_price(self, cart: Cart):
+    #     total_price = 0
+    #     for item in cart.items.all():
+    #         total_price += item.quantity * item.product.unitprice
+    #     return total_price
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'product', 'name', 'description']

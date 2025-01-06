@@ -28,7 +28,7 @@ class Command(BaseCommand):
         existing_users = User.objects.all()
         user_emails = {user.email for user in existing_users}
 
-        while customers_created < 50:  # Create 50 customers
+        while customers_created < 20:  # Creating 20 customers
             email = fake.unique.email()
             if email not in user_emails:
                 user = User.objects.create_user(
@@ -50,7 +50,7 @@ class Command(BaseCommand):
                     customers_created += 1
 
         # generate products data
-        for _ in range(100):
+        for _ in range(40):
             category = random.choice(Category.objects.all())
 
             Product.objects.create(
@@ -61,7 +61,7 @@ class Command(BaseCommand):
             )
 
         # generate Orders data
-        for _ in range(100):
+        for _ in range(80):
             product = random.choice(Product.objects.all())
             customer = random.choice(Customer.objects.all())
             payment_status = random.choice(
@@ -75,4 +75,4 @@ class Command(BaseCommand):
             )
 
         self.stdout.write(self.style.SUCCESS(
-            'Successfully generated 100 products, 50 customers, and 100 orders.'))
+            'Successfully generated 40 products, 20 customers, and 80 orders.'))

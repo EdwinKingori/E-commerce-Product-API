@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.core.validators import MinValueValidator
 from django.conf import settings
 from django.utils.text import slugify
+from uuid import uuid4
 # Create your models here.
 
 
@@ -65,12 +66,13 @@ class Customer(models.Model):
 
 
 class Cart(models.Model):
-    name = models.CharField(max_length=255)
+    id = models.UUIDField(primary_key=True, default=uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(
+        Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(
         default=1, validators=[MinValueValidator(1)])
