@@ -76,20 +76,31 @@ class CartSerializer(serializers.ModelSerializer):
     #     return total_price
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'product', 'name', 'description']
+
+# Adding custm serializers
+
+
 class AddItemSerializer(serializers.ModelSerializer):
+    # explicitly defining the product_id field
     product_id = serializers.IntegerField()
 
-    def validate_data(self, value):
+    # validating the value of product_id
+    def validate_product_id(self, value):
         if not Product.objects.filter(pk=value).exists():
             raise serializers.ValidationError(
                 "No product with the given id was found!"
             )
         return value
 
+    # overwriting the modelserializer's save method.
     def save(self, **kwargs):
         cart_id = self.context['cart_id']
-        product_id = self.context['product_id']
-        quantity = self.context['quantity']
+        product_id = self.validated_data['product_id']
+        quantity = self.validated_data['quantity']
 
         try:
             cart_item = CartItem.objects.get(
@@ -112,9 +123,3 @@ class UpdateCartItemSerializer(serializers.ModelField):
     class Meta:
         model = CartItem
         fields = ['quantity']
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = ['id', 'product', 'name', 'description']
