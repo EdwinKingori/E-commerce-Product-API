@@ -18,6 +18,7 @@ from .serializers import (ProductSerializer,
                           AddItemSerializer,
                           UpdateCartItemSerializer
                           )
+from .permissions import IsAdminOrReadOnly
 from .models import Product, Customer, Category, Order, OrderItem, Cart, CartItem, Review
 from .pagination import DefaultPagination
 # Create your views here.
@@ -28,6 +29,7 @@ class CategoryViewset(viewsets.ModelViewSet):
         products_count=Count('products')
     ).all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     # overriding the modelviewset's destroy method
     def destroy(self, request, *args, **kwargs):
@@ -41,6 +43,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend,
                        filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category']
+    permission_classes = [IsAdminOrReadOnly]
     search_fields = ['name', 'description']
     pagination_class = DefaultPagination
     ordering_fields = ['unitprice', 'last_update']
@@ -104,10 +107,10 @@ class CustomerViewSet(viewsets.ModelViewSet):
     pagination_class = DefaultPagination
     permission_classes = [IsAdminUser]
 
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    # def get_permissions(self):
+    #     if self.request.method == 'GET':
+    #         return [AllowAny()]
+    #     return [IsAuthenticated()]
 
     # configuring getting a users/customer's profile
     @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
