@@ -4,8 +4,20 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework.response import Response
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
-from .serializers import ProductSerializer, CategorySerializer, CustomerSerializer, ReviewSerializer, OrderSerializer, CartSerializer, CartItemSerializer, AddItemSerializer, UpdateCartItemSerializer
+from .serializers import (ProductSerializer,
+                          CategorySerializer,
+                          CustomerSerializer,
+                          ReviewSerializer,
+                          OrderSerializer,
+                          CartSerializer,
+                          CartItemSerializer,
+                          AddItemSerializer,
+                          UpdateCartItemSerializer
+                          )
 from .models import Product, Customer, Category, Order, OrderItem, Cart, CartItem, Review
 from .pagination import DefaultPagination
 # Create your views here.
@@ -55,12 +67,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return {'product_id': self.kwargs['product_pk']}
 
 
-class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    pagination_class = DefaultPagination
-
-
 class OrderViewset(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
@@ -90,3 +96,33 @@ class CartItemViewSet(viewsets.ModelViewSet):
         return CartItem.objects\
             .filter(cart_id=self.kwargs['cart_pk'])\
             .select_related('product')
+
+
+class CustomerViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    pagination_class = DefaultPagination
+    permission_classes = [IsAdminUser]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    # configuring getting a users/customer's profile
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        if not request.user.is_authenticated:
+            raise NotAuthenticated(
+                "You must be logged in to access this endpoint.")
+
+        customer, created = Customer.objects.get_or_create(
+            user_id=request.user.id)
+        if request.method == 'GET':
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        elif request.method == 'PUT':
+            serializer = CustomerSerializer(customer, request.data)
+            serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data)
