@@ -25,9 +25,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField()
+
     class Meta:
         model = Customer
-        fields = ['id', 'first_name', 'last_name', 'phone', 'birthdate']
+        fields = ['id', 'user_id', 'first_name',
+                  'last_name', 'phone', 'birthdate']
 
 
 class OrderSerializer(serializers.ModelSerializer):
