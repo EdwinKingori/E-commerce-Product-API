@@ -85,6 +85,11 @@ class OrderItemInLine(admin.TabularInline):
     model = OrderItem
 
 
+@admin.display(ordering='quantity')
+class OrderItemAdmin (admin.ModelAdmin):
+    list_display = ['product', 'quantity', 'unit_price']
+
+
 class OrderAdmin(admin.ModelAdmin):
     autocomplete = ['customer']
     inlines = [OrderItemInLine]
@@ -95,5 +100,5 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Order, OrderAdmin)
-admin.site.register(OrderItem)
+admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(Cart)

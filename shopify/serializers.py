@@ -24,6 +24,13 @@ class ProductSerializer(serializers.ModelSerializer):
         return product.unitprice * Decimal(1.1)
 
 
+# using this SimpleProductSerializer when returning basic product information is desired, mostly when returning to clients.
+class SimpleProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'unitprice']
+
+
 class CustomerSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(read_only=True)
 
@@ -33,18 +40,20 @@ class CustomerSerializer(serializers.ModelSerializer):
                   'last_name', 'phone', 'birthdate']
 
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = SimpleProductSerializer()
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'unit_price', 'quantity']
+
+
 class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+
     class Meta:
         model = Order
-        fields = ['id', 'customer', 'payment_status', 'placed_at']
-
-# using this simpeproductserializer when returning basic product information is needed
-
-
-class SimpleProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'name', 'unitprice']
+        fields = ['id', 'customer', 'payment_status', 'placed_at', 'items']
 
 
 class CartItemSerializer(serializers.ModelSerializer):
