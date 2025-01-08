@@ -71,8 +71,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewset(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
     serializer_class = OrderSerializer
+    pagination_class = DefaultPagination
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):  # this queryset violates the Command query separation principle
+        if self.request.user.is_staff:
+            return Order.objects.all()
+
+        # retrieving/calculating the customer_id from the user_id
+        customer_id, created = Customer.objects.only(
+            'id').get_or_create(user_id=self.request.user.id)  # this line performs both query and command, causing the violation
+        return Order.objects.filter(customer_id=customer_id)
 
 
 class CartViewSet(CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
