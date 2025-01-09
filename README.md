@@ -7,31 +7,98 @@ Url Configuration for the CRUD, Search and Nested endpoint operations
 
 Products CRUD:
 
-	POST /api/products/
-	
-	GET /api/products/
-	
-	GET /api/products/{id}/
-	
-	PUT /api/products/{id}/
-	
-	DELETE /api/products/{id}/
+	POST /shopify/products/
+	GET /shopify/products/
+	GET /shopify/products/{id}/
+	PUT /shopify/products/{id}/
+	DELETE /shopify/products/{id}/
+
+Orders CRUD:
+
+	POST/shopify/orders/
+	GET/shopify/customers/
+	GET/shopify/customers/{id}/
+
+Customers:
+
+	POST/shopify/customers/
+	GET/shopify/customers/
+	GET/shopify/customers/{id} 
+
+Cart
+
+	POST/shopify/carts/
+	GET/shopify/carts/items/
 
 Search & Filtering:
 
-	GET /api/products/?search=<name>
-	
-	GET /api/products/?category=<category>
-	
-	GET /api/products/?ordering=price
-	
-	User Management:
-	
-	POST /api/users/
-	
-	GET /api/users/
+	GET /shopify/products/?search=<name>
+	GET /shopify/products/?category=<category>
+	GET /shopify/products/?ordering=price
 
-Nested Product Collections:
+User Management:
 
-	GET /api/users/{user_id}/products/
+	POST /shopify/users/
+	GET /shopify/users/
+	Nested Product Collections:
+	GET /shopify/users/{user_id}/products/
 
+
+ Authentication Endpoints
+
+   Obtain Token: Obtain a JWT token for authentication.
+	
+	 http://127.0.0.1:8000/auth/jwt/create
+	Method: POST
+ 
+   Login Url: To obtain the token user
+   
+   	 http://127.0.0.1:8000/auth/users/me/
+	 Method: GET
+	
+
+
+Setup to Fork or Clone:
+
+Fork the Repository
+
+	Click on the Fork button in the top-right corner.
+	
+	Clone the Repository
+
+Copy the repository URL from your fork.
+
+	Run the following command in your terminal:
+	
+	git clone <repository-url>
+
+Set Up the Environment
+
+Navigate to the project directory:
+	
+	cd ecommerce_api
+
+Create and activate a virtual environment:
+
+	python3 -m venv venv
+	source env/bin/activate  # For Linux/Mac
+	env\Scripts\activate   # For Windows
+
+Install dependencies:
+
+	pip install -r requirements.txt
+	
+Run the Project Locally
+
+	
+Apply migrations:
+	
+	python manage.py migrate
+
+Start the development server:
+
+	python manage.py runserver
+	
+Visit: to interact with the API
+
+	http://127.0.0.1:8000/shopify/ 
