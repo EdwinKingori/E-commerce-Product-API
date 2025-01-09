@@ -75,7 +75,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class OrderViewset(viewsets.ModelViewSet):
     pagination_class = DefaultPagination
 
-    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
 
     # overriding the permissions to allow only admins to delete and update orders
     def get_permissions(self):
@@ -107,8 +107,8 @@ class OrderViewset(viewsets.ModelViewSet):
             return Order.objects.all()
 
         # retrieving/calculating the customer_id from the user_id
-        customer_id, created = Customer.objects.only(
-            'id').get_or_create(user_id=self.request.user.id)  # this line performs both query and command, causing the violation
+        customer_id = Customer.objects.only(
+            'id').get(user_id=self.request.user.id)  # this line performs both query and command, causing the violation, solved by signals
         return Order.objects.filter(customer_id=customer_id)
 
 
@@ -156,7 +156,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
             raise NotAuthenticated(
                 "You must be logged in to access this endpoint.")
 
-        customer, created = Customer.objects.get_or_create(
+        customer = Customer.objects.get(
             user_id=request.user.id)
         if request.method == 'GET':
             serializer = CustomerSerializer(customer)

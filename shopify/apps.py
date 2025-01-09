@@ -6,4 +6,4 @@ class ShopifyConfig(AppConfig):
     name = 'shopify'
 
     def ready(self):
-        import shopify.signals
+        import shopify.signals.handler_signals
