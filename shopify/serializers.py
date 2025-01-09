@@ -57,6 +57,12 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'customer', 'payment_status', 'placed_at', 'items']
 
 
+class UpdateOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['payment_status']
+
+
 class CartItemSerializer(serializers.ModelSerializer):
     product = SimpleProductSerializer()
     total_price = serializers.SerializerMethodField()

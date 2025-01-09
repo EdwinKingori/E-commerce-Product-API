@@ -17,7 +17,8 @@ from .serializers import (ProductSerializer,
                           CartSerializer,
                           CartItemSerializer,
                           AddItemSerializer,
-                          UpdateCartItemSerializer
+                          UpdateCartItemSerializer,
+                          UpdateOrderSerializer
                           )
 from .permissions import IsAdminOrReadOnly
 from .models import Product, Customer, Category, Order, OrderItem, Cart, CartItem, Review
@@ -72,9 +73,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewset(viewsets.ModelViewSet):
-
     pagination_class = DefaultPagination
-    permission_classes = [IsAuthenticated]
+
+    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
+
+    # overriding the permissions to allow only admins to delete and update orders
+    def get_permissions(self):
+        if self.request.method in ['PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [IsAuthenticated()]
 
     def create(self, request, *args, **kwargs):
         serializer = CreateOrderSerializer(
@@ -88,6 +95,8 @@ class OrderViewset(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreateOrderSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateOrderSerializer
         return OrderSerializer
 
     # def get_serializer_context(self):
