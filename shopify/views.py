@@ -13,6 +13,7 @@ from .serializers import (ProductSerializer,
                           CustomerSerializer,
                           ReviewSerializer,
                           OrderSerializer,
+                          CreateOrderSerializer,
                           CartSerializer,
                           CartItemSerializer,
                           AddItemSerializer,
@@ -71,9 +72,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class OrderViewset(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
+
     pagination_class = DefaultPagination
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer
+
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
 
     def get_queryset(self):  # this queryset violates the Command query separation principle
         if self.request.user.is_staff:
